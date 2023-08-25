@@ -1,0 +1,102 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+  text-wrap: balance;
+}
+
+body {
+  background-color: lightgray;
+}
+
+.app-contaner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 3rem 0.5rem;
+}
+
+.pokemon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.pokemon-container .pokeball {
+  width: 250px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  margin: 0.3rem;
+  border: 1px solid #efefef;
+  border-radius: 0.2rem;
+  text-align: center;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.089);
+}
+.pokemon-container .pokeball .number {
+  border-radius: 1rem;
+  padding: 0.2rem 0.4rem;
+  background-color: rgba(255, 255, 255, 0.863);
+  border: 1px solid gray;
+}
+.pokemon-container .pokeball h3 {
+  margin-bottom: 0.2rem;
+}
+.pokemon-container .pokeball img {
+  width: 120px;
+  height: 120px;
+}
+.pokemon-container .pokeball small {
+  text-transform: capitalize;
+}
+
+.rock {
+  background-color: #945151;
+}
+
+.ghost {
+  background-color: #f7f7f7;
+}
+
+.electric {
+  background-color: #ffffa1;
+}
+
+.bug {
+  background-color: #f6d6a7;
+}
+
+.poison {
+  background-color: #e0a7f6;
+}
+
+.normal {
+  background-color: #f4f4f4;
+}
+
+.fairy {
+  background-color: rgba(255, 192, 203, 0.863);
+}
+
+.fire {
+  background-color: #fbe3df;
+}
+
+.grass {
+  background-color: #e2f9e1;
+}
+
+.water {
+  background-color: #e0f1fd;
+}
+
+/*# sourceMappingURL=style.css.map */
