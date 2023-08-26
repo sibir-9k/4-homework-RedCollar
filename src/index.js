@@ -1,154 +1,94 @@
-const container = document.querySelector('.pokemon-container');
-
-let nextCards = 0;
-let namesPokemonsArray = [];
+import createBlockPokemon from './create-block-pokemon.js';
+let countCards = null;
 let allPokemonsArray = [];
-let sortedArray = [];
-
-// Ленивая подгрузка карточек
-const infinitePokemonObserver = new IntersectionObserver(
-	([entry], observer) => {
-		if (entry.isIntersecting) {
-			observer.unobserve(entry.target);
-			getNamesPokemons((nextCards += 1));
-		}
-	},
-	{ threshold: 0.5 }
-);
 
 // Получаю список имен покемонов
-const getNamesPokemons = async (offset = 0) => {
+const getNamesPokemons = async () => {
 	try {
-		const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=3&offset=${offset}`);
+		const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=10000`);
 		const data = await response.json();
 		const result = await data.results;
-
-		result.forEach((item) => {
-			getCurrentPokemonInfo(item.name);
-		});
+		return result;
 	} catch (error) {
 		console.error(error);
 	}
 };
 
 // Полученные имена передаю чтобы получить информацию о конкретном покемоне
-const getCurrentPokemonInfo = async (pokemonName) => {
+const getCurrentPokemonInfo = async (indexPokemons) => {
 	try {
-		const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
+		const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${indexPokemons}/`);
 		if (!response.ok) {
 			throw new Error('ошибка при получении инфо о конкретном покемоне');
 		}
-		let data = await response.json();
+		const responseData = await response.json();
 
-		allPokemonsArray.push({
-			number: data.id,
-			name: data.name,
-			imgURL: data.sprites.other.dream_world.front_default,
-			type: data.types[0].type.name,
-		});
-		let sort = await filtredAndSortArray(allPokemonsArray);
-		await createBlockPokemon(sort);
+		return {
+			number: responseData.id,
+			name: responseData.name,
+			imgURL: responseData.sprites.other.dream_world.front_default,
+			type: responseData.types[0].type.name,
+		};
 	} catch (error) {
 		console.error(error);
 	}
 };
 
-// Массив с объектами приходит не отсортированным и с дубликатами, тут я от них избаляюсь
-const filtredAndSortArray = async (array) => {
-	let filteredArrayUpd = array.filter(
-		(obj, index, self) => index === self.findIndex((o) => o.number === obj.number)
-	);
-	let sortedArrayUpd = filteredArrayUpd.sort((a, b) => a.number - b.number);
-	return sortedArrayUpd;
-};
+async function loadCards() {
+	const dataNamesPokemonsArray = await getNamesPokemons();
 
-// Отрисовываю карточки с покемонами
-const createBlockPokemon = async (sortedArrayPokemons) => {
-	sortedArrayPokemons.forEach((pokemon) => {
-		const cardBlock = document.createElement('div');
-		cardBlock.classList.add('pokeball');
-		container.appendChild(cardBlock);
+	const maxCards = 3;
 
-		const bgColorCard = paintBackgroundPokeball(pokemon.type ? pokemon.type : 'normal');
-		cardBlock.classList.add(bgColorCard);
-
-		const cardNumber = document.createElement('div');
-		cardNumber.classList.add('number');
-		cardBlock.appendChild(cardNumber);
-
-		const smallNumber = document.createElement('small');
-		smallNumber.textContent = `#${pokemon.number}`;
-		cardNumber.appendChild(smallNumber);
-
-		const img = document.createElement('img');
-		img.alt = pokemon.name;
-		img.addEventListener('load', () => {
-			cardBlock.appendChild(img);
+	if (countCards <= maxCards) {
+		const pokemonsPromises = dataNamesPokemonsArray.slice(0, maxCards).map((dataPokemon, index) => {
+			const currentCount = index + 1;
+			return getCurrentPokemonInfo(currentCount);
 		});
-		img.src = pokemon.imgURL;
 
-		const pokemonBlock = document.createElement('div');
-		pokemonBlock.classList.add('pokemon');
-		cardBlock.appendChild(pokemonBlock);
+		const pokemons = await Promise.all(pokemonsPromises);
+		allPokemonsArray = pokemons;
+		createBlockPokemon(allPokemonsArray);
+	}
 
-		const h3 = document.createElement('h3');
-		h3.classList.add('pokemon-name');
-		h3.textContent = pokemon.name;
-		pokemonBlock.appendChild(h3);
+	if (countCards > maxCards) {
+		const nextPokemonsPromises = dataNamesPokemonsArray
+			.slice(0, countCards)
+			.map((dataPokemon, index) => {
+				const currentCount = index + maxCards + 1;
+				return getCurrentPokemonInfo(currentCount);
+			});
 
-		const typePokemon = document.createElement('small');
-		typePokemon.classList.add('pokemon-type');
-		typePokemon.textContent = pokemon.type;
-		pokemonBlock.appendChild(typePokemon);
+		const pokemons = await Promise.all(nextPokemonsPromises);
+		allPokemonsArray = pokemons;
+		createBlockPokemon(allPokemonsArray);
+	}
+}
+
+loadCards();
+
+// Создаем Intersection Observer
+const options = {
+	root: null,
+	rootMargin: '0px',
+	threshold: 0.5,
+};
+
+const observer = new IntersectionObserver((entries, observer) => {
+	entries.forEach((entry) => {
+		if (entry.isIntersecting) {
+			// Если элемент находится в зоне видимости (проходит порог видимости)
+			const index = allPokemonsArray.length; // индекс следующего покемона для загрузки
+			const pokemonPromise = getCurrentPokemonInfo(index + 1); // получаем информацию о покемоне с указанным индексом
+			pokemonPromise.then((pokemon) => {
+				allPokemonsArray.push(pokemon); // добавляем покемона в массив
+				createBlockPokemon([pokemon]); // отрисовываем его карточку
+			});
+		}
 	});
+}, options);
 
-	const lastCard = document.querySelector('.pokeball:last-child');
+const lastCard = document.querySelector('.pokeball:last-child');
 
-	if (lastCard) {
-		infinitePokemonObserver.observe(lastCard);
-	}
-};
-
-// Крашу фон карточки, взависимости от типа покемона
-const paintBackgroundPokeball = (type) => {
-	let bgColorCard = null;
-	switch (type) {
-		case 'rock':
-			bgColorCard = 'rock';
-			break;
-		case 'ghost':
-			bgColorCard = 'ghost';
-			break;
-		case 'electric':
-			bgColorCard = 'electric';
-			break;
-		case 'bug':
-			bgColorCard = 'bug';
-			break;
-		case 'poison':
-			bgColorCard = 'poison';
-			break;
-		case 'normal':
-			bgColorCard = 'normal';
-			break;
-		case 'fairy':
-			bgColorCard = 'fairy';
-			break;
-		case 'fire':
-			bgColorCard = 'fire';
-			break;
-		case 'grass':
-			bgColorCard = 'grass';
-			break;
-		case 'water':
-			bgColorCard = 'water';
-			break;
-
-		default:
-			bgColorCard = '';
-			break;
-	}
-	return bgColorCard;
-};
-
-getNamesPokemons();
+if (lastCard) {
+	observer.observe(lastCard);
+}
