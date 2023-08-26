@@ -40,6 +40,7 @@ const createBlockPokemon = (sortedArrayPokemons) => {
 		typePokemon.textContent = pokemon.type;
 		pokemonBlock.appendChild(typePokemon);
 	});
+
 };
 
 export default createBlockPokemon;

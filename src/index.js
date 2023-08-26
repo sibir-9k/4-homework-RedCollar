@@ -62,6 +62,8 @@ async function loadCards() {
 		allPokemonsArray = pokemons;
 		createBlockPokemon(allPokemonsArray);
 	}
+
+	observer.observe(document.querySelector('.footer'));
 }
 
 loadCards();
@@ -69,11 +71,12 @@ loadCards();
 // Создаем Intersection Observer
 const options = {
 	root: null,
-	rootMargin: '0px',
+	rootMargin: ' 0px 0px 75px 0px',
 	threshold: 0.5,
 };
 
 const observer = new IntersectionObserver((entries, observer) => {
+	console.log(entries);
 	entries.forEach((entry) => {
 		if (entry.isIntersecting) {
 			// Если элемент находится в зоне видимости (проходит порог видимости)
@@ -83,12 +86,11 @@ const observer = new IntersectionObserver((entries, observer) => {
 				allPokemonsArray.push(pokemon); // добавляем покемона в массив
 				createBlockPokemon([pokemon]); // отрисовываем его карточку
 			});
+			// .then(() => {
+			// 	observer.unobserve(entry.target); // останавливаем наблюдение за элементом
+			// });                      // без него работает, а с ним нет
 		}
 	});
 }, options);
 
-const lastCard = document.querySelector('.pokeball:last-child');
-
-if (lastCard) {
-	observer.observe(lastCard);
-}
+// observer.observe(document.querySelector('.footer'));
