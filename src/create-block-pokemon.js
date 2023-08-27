@@ -1,14 +1,14 @@
-import paintBackgroundPokeball from './paint-block-pokemon.js';
+import { getPaintBackgroundPokeball } from './paint-block-pokemon.js';
 
 const container = document.querySelector('.pokemon-container');
 
-const createBlockPokemon = (sortedArrayPokemons) => {
+export const createBlockPokemon = (sortedArrayPokemons) => {
 	sortedArrayPokemons.forEach((pokemon) => {
 		const cardBlock = document.createElement('div');
 		cardBlock.classList.add('pokeball');
 		container.appendChild(cardBlock);
 
-		const bgColorCard = paintBackgroundPokeball(pokemon.type ? pokemon.type : 'normal');
+		const bgColorCard = getPaintBackgroundPokeball(pokemon.type ? pokemon.type : 'normal');
 		cardBlock.classList.add(bgColorCard);
 
 		const cardNumber = document.createElement('div');
@@ -40,7 +40,4 @@ const createBlockPokemon = (sortedArrayPokemons) => {
 		typePokemon.textContent = pokemon.type;
 		pokemonBlock.appendChild(typePokemon);
 	});
-
 };
-
-export default createBlockPokemon;

@@ -1,4 +1,4 @@
-import createBlockPokemon from './create-block-pokemon.js';
+import { createBlockPokemon } from './create-block-pokemon.js';
 let countCards = null;
 let allPokemonsArray = [];
 
@@ -7,8 +7,7 @@ const getNamesPokemons = async () => {
 	try {
 		const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=10000`);
 		const data = await response.json();
-		const result = await data.results;
-		return result;
+		return await data.results;
 	} catch (error) {
 		console.error(error);
 	}
@@ -45,8 +44,7 @@ async function loadCards() {
 			return getCurrentPokemonInfo(currentCount);
 		});
 
-		const pokemons = await Promise.all(pokemonsPromises);
-		allPokemonsArray = pokemons;
+		const allPokemonsArray = await Promise.all(pokemonsPromises);
 		createBlockPokemon(allPokemonsArray);
 	}
 
@@ -58,8 +56,8 @@ async function loadCards() {
 				return getCurrentPokemonInfo(currentCount);
 			});
 
-		const pokemons = await Promise.all(nextPokemonsPromises);
-		allPokemonsArray = pokemons;
+		const allPokemonsArray = await Promise.all(nextPokemonsPromises);
+
 		createBlockPokemon(allPokemonsArray);
 	}
 

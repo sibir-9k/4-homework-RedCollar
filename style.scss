@@ -19,7 +19,7 @@ body {
 	align-items: center;
 	justify-content: center;
 	min-height: 100vh;
-	padding: 3rem 0.5rem;
+	padding: 48px 8px;
 }
 .pokemon-container {
 	display: flex;
@@ -34,22 +34,22 @@ body {
 		flex-direction: column;
 		align-items: center;
 		justify-content: space-between;
-		padding: 1.5rem 0;
-		margin: 0.3rem;
+		padding: 24px 0;
+		margin: 4.8px;
 		border: 1px solid #efefef;
-		border-radius: 0.2rem;
+		border-radius: 3.2px;
 		text-align: center;
 		box-shadow: 0 3px 15px rgba(0, 0, 0, 0.089);
 
 		.number {
-			border-radius: 1rem;
-			padding: 0.2rem 0.4rem;
+			border-radius: 16px;
+			padding: 3.2px 6.4px;
 			background-color: rgba(255, 255, 255, 0.863);
 			border: 1px solid gray;
 		}
 
 		h3 {
-			margin-bottom: 0.2rem;
+			margin-bottom: 3.2px;
 		}
 
 		img {
